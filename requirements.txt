@@ -1,4 +1,3 @@
-# --- Runtime ---
 requests>=2.31.0
 beautifulsoup4>=4.12.0
 cloudscraper>=1.2.71
@@ -6,9 +5,3 @@ yt-dlp>=2024.1.0
 cryptography>=42.0.0
 ecdsa>=0.18.0
 rich>=13.7.0
-
-# --- Build-time only (compile pow_cython for this machine's Python) ---
-setuptools>=68.0.0
-wheel>=0.42.0
-cython>=3.0.0
-st-zig
