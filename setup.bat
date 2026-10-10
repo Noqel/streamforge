@@ -43,18 +43,6 @@ if errorlevel 1 (
 :: --- 4. pow_cython mit zig cc kompilieren ---
 echo [3/4] Compiling pow_cython with zig cc...
 
-:: zig-cc.exe liegt nach der Installation in venv\Scripts\
-if not exist "venv\Scripts\zig-cc.exe" (
-    echo [ERROR] zig-cc.exe not found in venv\Scripts\
-    echo         Check that zig-cc-python installed correctly.
-    pause
-    exit /b 1
-)
-
-set "CC=zig-cc"
-set "CXX=zig-cc-cxx"
-set "PATH=%CD%\venv\Scripts;%PATH%"
-
 venv\Scripts\python.exe setup.py build_ext --inplace --force
 if errorlevel 1 (
     echo.
@@ -68,6 +56,7 @@ echo [4/4] Verifying pow_cython...
 venv\Scripts\python.exe -c "from pow_cython import er; print('  OK:', er('test', 8))"
 if errorlevel 1 (
     echo [ERROR] pow_cython could not be imported after build.
+    echo         Check that the .pyd file was created in the project folder.
     pause
     exit /b 1
 )

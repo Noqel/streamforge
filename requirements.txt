@@ -11,5 +11,4 @@ rich>=13.7.0
 setuptools>=68.0.0
 wheel>=0.42.0
 cython>=3.0.0
-ziglang
-zig-cc-python
+st-zig
