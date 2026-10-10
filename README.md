@@ -1,6 +1,6 @@
 # StreamForge
 
-Downloader for anime, series, and movies from aniworld.to, serienstream.to, and filmo.to.
+Downloader for anime, series, and movies from xxx
 
 ## Quick Start
 
@@ -28,9 +28,9 @@ multi-audio track selection for each source.
 
 | Source          | Content           | Languages                            |
 |-----------------|-------------------|--------------------------------------|
-| aniworld.to     | Anime             | German Dub, German Sub, Japanese Sub |
-| serienstream.to | Series and movies | German, English                      |
-| filmo.to        | Movies            | German, English                      |
+| xxxworld.to     | Anime             | German Dub, German Sub, Japanese Sub |
+| serienxxxxx.to | Series and movies | German, English                      |
+| filxx.to        | Movies            | German, English                      |
 
 ## Requirements
 
@@ -55,11 +55,6 @@ walks you through each step:
 
 You can paste a full URL at the search prompt to skip searching.
 
-## Output
-Downloads/
-├── Demon Slayer Kimetsu No Yaiba S01E01 [GER-DUB].mp4
-├── Demon Slayer Kimetsu No Yaiba S01E02 [GER-DUB].mp4
-└── Fight Club [ENG-SUB].mp4
 
 text
 
@@ -73,23 +68,6 @@ Editable constants live in `src/config.py`:
 - `DOWNLOADS_DIR` — output folder (default: `Downloads/`)
 - `_LANG_TO_ISO` — language mapping for audio track selection
 - Base URLs for each source
-
-## Project Structure
-streamforge/
-├── src/
-│ ├── main.py CLI entry point
-│ ├── extractors/ Hoster-specific stream resolvers
-│ │ ├── byse.py Filemoon / Byse resolver
-│ │ └── voe.py VOE resolver
-│ └── pow/ Proof-of-work module (Cython)
-│ ├── pow_cython.pyx Source
-│ └── pow_cython.*.pyd Compiled binary
-├── build/ Build scripts (development only)
-├── setup.bat First-time setup (Windows)
-├── run.bat Start the program (Windows)
-└── requirements.txt
-
-text
 
 ## Troubleshooting
 
