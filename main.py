@@ -1123,13 +1123,37 @@ def _clean_text(s):
     s = unescape(s)          # second pass for double-encoded entities
     return s.strip()
     
+# Windows: 255 chars per path component, 260 for the full path.
+# We reserve room for the extension and the Downloads\ prefix.
+_MAX_FILENAME = 200
+
+
 def sanitize_filename(name):
     name = _clean_text(name)
     name = re.sub(r'[<>:"/\\|?*]', "_", name)
     name = _WS_RE.sub(" ", name).strip(" .")   # collapse whitespace, no trailing dots/spaces
+
+    # Windows reserves these device names — avoid them entirely
+    _RESERVED = {"CON", "PRN", "AUX", "NUL",
+                 "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+                 "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"}
+    if name.upper() in _RESERVED:
+        name = f"_{name}"
+
+    if len(name) > _MAX_FILENAME:
+        # Truncate on a word boundary if possible
+        cut = name[:_MAX_FILENAME].rsplit(" ", 1)[0]
+        name = (cut if len(cut) > _MAX_FILENAME * 0.7 else name[:_MAX_FILENAME]).rstrip(" .")
+
     return name or "untitled"
 
+
 def build_filename(item, series_url):
+    """
+    Build the base filename (without extension and without the [LANG] tag).
+    The final length cap is applied in sanitize_filename, but we also trim
+    the title part here so the language tag has room to breathe.
+    """
     if item["type"] == "episode":
         slug = series_url.rstrip("/").split("/")[-1]
         anime_name = _clean_text(slug.replace("-", " ")).title()
@@ -1137,9 +1161,17 @@ def build_filename(item, series_url):
         e = item["episode"] or 0
         name = f"{anime_name} S{s:02d}E{e:02d}"
         if item["title"]:
-            name += f" - {_clean_text(item['title'])}"
+            # Leave room for " [GER-DUB].mp4" = 15 chars
+            budget = _MAX_FILENAME - len(name) - 15
+            title = _clean_text(item["title"])
+            if budget > 5 and len(title) > budget:
+                cut = title[:budget].rsplit(" ", 1)[0]
+                title = cut or title[:budget]
+            if title:
+                name += f" - {title}"
     else:
         name = _clean_text(item["title"]) or _clean_text(series_url.rstrip("/").split("/")[-1])
+
     return sanitize_filename(name)
     
 # ===================================================================
