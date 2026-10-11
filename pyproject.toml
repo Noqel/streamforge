@@ -1,0 +1,31 @@
+[build-system]
+requires = [
+    "setuptools>=68",
+    "wheel",
+    "cython>=3.0",
+    "setuptools-zig>=0.5",
+    "ziglang<0.16",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "streamforge"
+version = "2.0.0"
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.31.0",
+    "beautifulsoup4>=4.12.0",
+    "cloudscraper>=1.2.71",
+    "yt-dlp>=2024.1.0",
+    "cryptography>=42.0.0",
+    "ecdsa>=0.18.0",
+    "rich>=13.7.0",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+py-modules = []
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["streamforge*"]
