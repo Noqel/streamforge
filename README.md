@@ -73,36 +73,6 @@ frequently DNS-blocked. It uses Cloudflare and Google as resolvers, with
 automatic fallback. See `src/streamforge/sites/serienstream.py` for the
 implementation.
 
-## Project Structure
-streamforge/
-├── src/
-│ └── streamforge/
-│ ├── cli.py Interactive entry point
-│ ├── config.py Constants and paths
-│ ├── download.py yt-dlp wrapper with progress bar
-│ ├── filenames.py Filename sanitization
-│ ├── models.py Dataclasses
-│ ├── resolver.py Site + hoster coordination
-│ ├── ui.py Terminal styling and prompts
-│ ├── sites/ One file per streaming source
-│ │ ├── base.py Site interface
-│ │ ├── aniworld.py
-│ │ ├── serienstream.py
-│ │ └── filmo.py
-│ ├── hosters/ One file per stream hoster
-│ │ ├── base.py Hoster interface
-│ │ ├── byse.py Filemoon / Byse
-│ │ └── voe.py VOE
-│ └── pow/ Proof-of-work extension (Cython)
-│ ├── pow_cython.pyx
-│ └── pow_cython.*.pyd
-├── setup.py Build script
-├── pyproject.toml Package metadata
-├── requirements.txt
-├── setup.bat First-time setup (Windows)
-├── run.bat Start the program (Windows)
-└── README.md
-
 ## Adding a New Source
 
 Create `src/streamforge/sites/yoursite.py` with a class that inherits from
@@ -123,12 +93,12 @@ class YourSite(Site):
 Register it in src/streamforge/sites/__init__.py. It will be picked up by
 the search loop and the resolver automatically.
 
-Adding a New Hoster
+##Adding a New Hoster
 Same pattern in src/streamforge/hosters/. Register in
 src/streamforge/hosters/__init__.py. Any site can then reference it by
 name (or a site-specific alias).
 
-Troubleshooting
+##Troubleshooting
 "Python not found" when running setup.bat
 Install Python 3.10+ from python.org and check "Add Python to PATH" during
 setup.
@@ -137,7 +107,6 @@ setup.
 The prebuilt module targets Python 3.12 on 64-bit Windows. On a different
 version, rebuild:
 
-text
 pip install cython
 python setup.py build_ext --inplace
 Downloads are slow
@@ -155,7 +124,6 @@ Some sources are DNS-blocked on certain ISPs. StreamForge uses DNS-over-HTTPS
 via Cloudflare and Google to bypass this automatically. If a source still
 fails, run:
 
-text
 python -c "import requests; print(requests.get('https://cloudflare-dns.com/dns-query', params={'name': 'example.com', 'type': 'A'}, headers={'Accept': 'application/dns-json'}).json())"
 to confirm DoH is reachable from your network.
 
@@ -163,7 +131,7 @@ to confirm DoH is reachable from your network.
 The hoster may have removed the file or region-locked it. Try the other
 hoster if one is available.
 
-Legal
+## Legal
 StreamForge is a downloader. It does not host, index, or distribute any
 content. All media is retrieved from the sources configured by the user.
 Users are responsible for ensuring their use complies with the terms of
