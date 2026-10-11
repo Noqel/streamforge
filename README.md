@@ -93,12 +93,12 @@ class YourSite(Site):
 Register it in src/streamforge/sites/__init__.py. It will be picked up by
 the search loop and the resolver automatically.
 
-##Adding a New Hoster
+## Adding a New Hoster
 Same pattern in src/streamforge/hosters/. Register in
 src/streamforge/hosters/__init__.py. Any site can then reference it by
 name (or a site-specific alias).
 
-##Troubleshooting
+## Troubleshooting
 "Python not found" when running setup.bat
 Install Python 3.10+ from python.org and check "Add Python to PATH" during
 setup.
