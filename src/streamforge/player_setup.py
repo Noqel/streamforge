@@ -44,6 +44,62 @@ MPV_DIR = TOOLS_DIR / "mpv"
 # ===================================================================
 # Helpers
 # ===================================================================
+# Shader chains for Anime4K Mode A
+_MODE_A_HIGH = (
+    "~~/shaders/Anime4K_Clamp_Highlights.glsl:"
+    "~~/shaders/Anime4K_Restore_CNN_VL.glsl:"
+    "~~/shaders/Anime4K_Upscale_CNN_x2_VL.glsl:"
+    "~~/shaders/Anime4K_AutoDownscalePre_x2.glsl:"
+    "~~/shaders/Anime4K_AutoDownscalePre_x4.glsl:"
+    "~~/shaders/Anime4K_Upscale_CNN_x2_M.glsl"
+)
+
+_MODE_A_LOW = (
+    "~~/shaders/Anime4K_Clamp_Highlights.glsl:"
+    "~~/shaders/Anime4K_Restore_CNN_M.glsl:"
+    "~~/shaders/Anime4K_Upscale_CNN_x2_M.glsl:"
+    "~~/shaders/Anime4K_AutoDownscalePre_x2.glsl:"
+    "~~/shaders/Anime4K_AutoDownscalePre_x4.glsl:"
+    "~~/shaders/Anime4K_Upscale_CNN_x2_S.glsl"
+)
+
+
+def _patch_mpv_conf(config_dir: Path, variant: str):
+    """
+    Add/overwrite the startup options in mpv.conf:
+      - volume=50
+      - fullscreen=yes
+      - glsl-shaders=<Mode A chain for the chosen variant>
+    """
+    mpv_conf = config_dir / "mpv.conf"
+    if not mpv_conf.exists():
+        mpv_conf.write_text("", encoding="utf-8")
+
+    lines = mpv_conf.read_text(encoding="utf-8").splitlines()
+
+    # Strip any existing versions of the three options (with or without --)
+    strip_prefixes = (
+        "volume=", "fullscreen=", "fs=",
+        "glsl-shaders=",
+    )
+    cleaned = []
+    for line in lines:
+        stripped = line.strip()
+        if any(stripped.startswith(p) for p in strip_prefixes):
+            continue
+        cleaned.append(line)
+
+    # Append the three options
+    shader_chain = _MODE_A_HIGH if variant == "high" else _MODE_A_LOW
+    cleaned.append("")
+    cleaned.append("# --- StreamForge startup defaults ---")
+    cleaned.append("hwdec=gpu")
+    cleaned.append("volume=50")
+    cleaned.append("fullscreen=yes")
+    cleaned.append(f'glsl-shaders="{shader_chain}"')
+
+    mpv_conf.write_text("\n".join(cleaned) + "\n", encoding="utf-8")
+    print(f"  patched mpv.conf (volume=50, fullscreen, Anime4K Mode A)")
 
 def _download(url: str, label: str = "") -> bytes:
     if label:
@@ -242,6 +298,9 @@ def install_anime4k(variant: str = "low", target: str = "portable",
         if src.exists():
             shutil.move(str(src), str(config_dir / name))
             print(f"  installed {name}")
+
+    # ---- Patch mpv.conf with startup defaults ----
+    _patch_mpv_conf(config_dir, variant)
 
     # ---- Download Anime4K shaders ----
     print("Downloading Anime4K shaders...")
