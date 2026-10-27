@@ -6,6 +6,7 @@ from rich.table import Table
 from rich import box
 from rich.text import Text
 
+from .player import play_sequential, detect_players
 # cli.py — Imports oben
 from .ui import (
     console, show_banner, boot_sequence,
@@ -114,6 +115,29 @@ def _display_episodes(items):
         table.add_row(str(i), tag, item.title or "—")
 
     console.print(table)
+    
+def _pick_action():
+    console.print()
+    console.print("[bold]What do you want to do?[/]")
+    console.print("  [bright_green]1[/]  Play")
+    console.print("  [bright_green]2[/]  Download")
+    console.print()
+
+    available = detect_players()
+    if not available:
+        warn("No player found (install mpv or vlc for Play).")
+    elif "mpv" in available:
+        console.print("  [dim]player: mpv[/]")
+    elif "vlc" in available:
+        console.print("  [dim]player: vlc[/]")
+
+    while True:
+        choice = ask("")
+        if choice in ("1", "p", "play"):
+            return "play"
+        if choice in ("2", "d", "download"):
+            return "download"
+        warn("Invalid choice.")
 
 
 def _pick_items(items):
@@ -180,13 +204,22 @@ def main():
             ok(f"found [bold]{len(items)}[/] items")
             _display_episodes(items)
 
+            action = _pick_action()
+
             if len(items) == 1:
                 selected = items
                 info("single item — auto-selected.")
             else:
                 selected = _pick_items(items)
 
-            run_downloads(selected, series_url, language)
+            if not selected:
+                pause()
+                continue
+
+            if action == "play":
+                play_sequential(selected, language, series_url)
+            else:
+                run_downloads(selected, series_url, language)
 
         except KeyboardInterrupt:
             console.print()
