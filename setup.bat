@@ -44,6 +44,31 @@ if errorlevel 1 ( echo [ERROR] streamforge.pow not importable. & pause & exit /b
 venv\Scripts\python.exe -c "import streamforge.cli; print('  cli OK')"
 if errorlevel 1 ( echo [ERROR] streamforge.cli not importable. & pause & exit /b 1 )
 
+:: --- 5. Optional: Anime4K installieren ---
+echo.
+set /p INSTALL_A4K="Install Anime4K shaders for mpv? [y/N]: "
+if /i not "%INSTALL_A4K%"=="y" goto :skip_anime4k
+
+echo.
+echo Which GPU tier do you have?
+echo   [1] Low-end  (GTX 980, 1060, RX 570)
+echo   [2] High-end (GTX 1080, RTX 2070, 3060, RX 590, Vega 56)
+set /p A4K_TIER="Choose [1/2] (default 1): "
+if "%A4K_TIER%"=="2" (
+    set "A4K_VARIANT=high"
+) else (
+    set "A4K_VARIANT=low"
+)
+
+venv\Scripts\python.exe -m streamforge.anime4k_setup --variant %A4K_VARIANT%
+if errorlevel 1 (
+    echo [WARNUNG] Anime4K-Installation fehlgeschlagen.
+    echo Du kannst sie spaeter manuell nachholen:
+    echo   venv\Scripts\python.exe -m streamforge.anime4k_setup --variant low
+)
+
+:skip_anime4k
+
 :: --- 6. Build-Artefakte aufraeumen ---
 echo.
 echo Cleaning up build artifacts...
