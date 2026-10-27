@@ -11,12 +11,14 @@ echo.
 python --version >nul 2>&1
 if errorlevel 1 (
     echo [ERROR] Python not found.
+    echo         Install Python 3.10+ from https://www.python.org/downloads/
+    echo         Make sure "Add Python to PATH" is checked during installation.
     pause
     exit /b 1
 )
 
 :: --- 2. venv anlegen ---
-echo [1/4] Creating virtual environment...
+echo [1/5] Creating virtual environment...
 if exist "venv\Scripts\python.exe" (
     echo       venv already exists, skipping.
 ) else (
@@ -24,30 +26,32 @@ if exist "venv\Scripts\python.exe" (
     if errorlevel 1 ( echo [ERROR] venv failed. & pause & exit /b 1 )
 )
 
-:: --- 3. Dependencies + Build-Tools ---
-echo [2/4] Installing dependencies...
+:: --- 3. Dependencies installieren ---
+echo [2/5] Installing dependencies...
 venv\Scripts\python.exe -m pip install --upgrade pip
 venv\Scripts\python.exe -m pip install -r requirements.txt
 venv\Scripts\python.exe -m pip install "setuptools>=68" wheel "cython>=3.0" "setuptools-zig>=0.5" "ziglang<0.16"
 if errorlevel 1 ( echo [ERROR] pip install failed. & pause & exit /b 1 )
 
 :: --- 4. Package + Extension bauen ---
-echo [3/4] Compiling pow_cython...
+echo [3/5] Compiling pow_cython...
 venv\Scripts\python.exe -m pip install --no-build-isolation -e .
 if errorlevel 1 ( echo [ERROR] Build failed. & pause & exit /b 1 )
 
 :: --- 5. Verifizieren ---
-echo [4/4] Verifying installation...
+echo [4/5] Verifying installation...
 venv\Scripts\python.exe -c "from streamforge.pow import er; print('  pow OK:', er('test', 8))"
 if errorlevel 1 ( echo [ERROR] streamforge.pow not importable. & pause & exit /b 1 )
 
 venv\Scripts\python.exe -c "import streamforge.cli; print('  cli OK')"
 if errorlevel 1 ( echo [ERROR] streamforge.cli not importable. & pause & exit /b 1 )
 
-:: --- 5. Optional: Anime4K installieren ---
+:: --- 6. Optional: mpv + Anime4K ---
 echo.
-set /p INSTALL_A4K="Install Anime4K shaders for mpv? [y/N]: "
-if /i not "%INSTALL_A4K%"=="y" goto :skip_anime4k
+echo [5/5] Optional: Install mpv and Anime4K
+echo.
+set /p INSTALL_MPV="Download mpv and install Anime4K? [y/N]: "
+if /i not "%INSTALL_MPV%"=="y" goto :skip_mpv
 
 echo.
 echo Which GPU tier do you have?
@@ -60,16 +64,19 @@ if "%A4K_TIER%"=="2" (
     set "A4K_VARIANT=low"
 )
 
-venv\Scripts\python.exe -m streamforge.anime4k_setup --variant %A4K_VARIANT%
+echo.
+echo Installing mpv and Anime4K...
+venv\Scripts\python.exe -m streamforge.player_setup --variant %A4K_VARIANT% --target portable
 if errorlevel 1 (
-    echo [WARNUNG] Anime4K-Installation fehlgeschlagen.
-    echo Du kannst sie spaeter manuell nachholen:
-    echo   venv\Scripts\python.exe -m streamforge.anime4k_setup --variant low
+    echo.
+    echo [WARNUNG] mpv/Anime4K-Installation fehlgeschlagen.
+    echo Manuell nachholen:
+    echo   venv\Scripts\python.exe -m streamforge.player_setup --variant %A4K_VARIANT%
 )
 
-:skip_anime4k
+:skip_mpv
 
-:: --- 6. Build-Artefakte aufraeumen ---
+:: --- 7. Build-Artefakte aufraeumen ---
 echo.
 echo Cleaning up build artifacts...
 if exist build rmdir /s /q build
@@ -81,7 +88,8 @@ venv\Scripts\python.exe -m pip uninstall -y cython setuptools-zig ziglang >nul 2
 
 echo.
 echo ===================================
-echo   Setup complete. Run run.bat to start.
+echo   Setup complete.
+echo   Start with: run.bat
 echo ===================================
 pause
 endlocal
