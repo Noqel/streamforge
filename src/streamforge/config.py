@@ -22,6 +22,3 @@ LANG_TO_ISO = {
     "GER-SUB": "de",
     "ENG-SUB": "en",
 }
-# Player configuration
-PLAYER = None        # "mpv", "vlc", or None for auto-detect
-PLAYER_ARGS = []     # extra CLI flags, e.g. ["--fullscreen", "--volume=80"]
