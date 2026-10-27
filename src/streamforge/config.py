@@ -22,3 +22,16 @@ LANG_TO_ISO = {
     "GER-SUB": "de",
     "ENG-SUB": "en",
 }
+
+# ===================================================================
+# Player configuration
+# ===================================================================
+# PLAYER: "mpv", "vlc", a full path to a player executable, or None
+#         for auto-detection (portable mpv -> portable vlc -> PATH).
+PLAYER = None
+
+# Extra CLI flags passed to the player before the URL.
+# Examples:
+#   ["--fullscreen"]
+#   ["--volume=80", "--fs-screen=0"]
+PLAYER_ARGS = []
